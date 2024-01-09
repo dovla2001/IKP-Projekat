@@ -44,11 +44,6 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-   /* if (connect(client_socket, (struct sockaddr*)&server_addr, sizeof(server_addr)) == -1) {
-        perror("Connection failed");
-        exit(EXIT_FAILURE);
-    }*/
-
     // Slanje zahteva Load Balancer-u
     printf("Unesite poruku koju zelite da skladistite:\n");
     gets_s(dataBuffer, BUFFER_SIZE);

@@ -45,6 +45,8 @@ int findWorkerWithMinData(WorkerInfo workers[], int numWorkers) {
 
 int main() {
 
+	printf("======================================= LOAD BALANCER ========================================\n\n");
+
 	sockaddr_in serverAddress;
 
 	sockaddr_in workerAddress;
@@ -113,7 +115,7 @@ int main() {
 		return 1;
 	}
 
-	printf("Load Balancer je spreman i ceka na zahteve klijenata za skladistenje, kao i na prijavljivanje workera...");
+	printf("Load Balancer je spreman i ceka na zahteve klijenata za skladistenje, kao i na prijavljivanje workera...\n");
 	
 	unsigned long mode = 1;
 	if (ioctlsocket(serverSocket, FIONBIO, &mode) != 0 || ioctlsocket(workerSocket, FIONBIO, &mode) != 0)
@@ -131,6 +133,7 @@ int main() {
 
 	int nextWorkerIndex = 0;
 
+	WorkerData receivedData;
 	
 	while (true)
 	{
@@ -149,19 +152,22 @@ int main() {
 		int sockAddrLen = sizeof(clientAddress);
 		int sockWorkLen = sizeof(workerAddr);
 
-		iResult = recvfrom(serverSocket, dataBuffer, BUFFER_SIZE, 0, (SOCKADDR*)&clientAddress, &sockAddrLen);
+		iResult = recvfrom(serverSocket, (char*)&receivedData, sizeof(WorkerData), 0, (SOCKADDR*)&clientAddress, &sockAddrLen);
 
 		if (iResult != SOCKET_ERROR) {
 
-			dataBuffer[iResult] = '\0';
+			//dataBuffer[iResult] = '\0';
 
-			printf("\nKlijent je poslao poruku: %s", dataBuffer);
+			printf("\nPrimljena poruka:\n");
+			printf("Ime: %s\n", receivedData.ime);
+			printf("Prezime: %s\n", receivedData.prezime);
+			printf("Plata: %.2lf\n", receivedData.plata);
 
 			int workerIndex = nextWorkerIndex;
 			nextWorkerIndex = (nextWorkerIndex + 1) % numWorkers;
 			receivedMessagesCount[workerIndex]++;
 
-			iResult = sendto(workerSocket, dataBuffer, strlen(dataBuffer), 0, (SOCKADDR*)&workers[workerIndex].address, sizeof(workers[workerIndex].address));
+			iResult = sendto(workerSocket, (char*)&receivedData, sizeof(receivedData), 0, (SOCKADDR*)&workers[workerIndex].address, sizeof(workers[workerIndex].address));
 			if (iResult == SOCKET_ERROR) {
 				printf("sendto failed with error: %d\n", WSAGetLastError());
 				// Obrada greške po potrebi...

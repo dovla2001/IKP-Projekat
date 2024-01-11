@@ -1,5 +1,5 @@
 ﻿  Worker.cpp
-C:\Users\Lenovo\Desktop\4. godina\Industrijski komunikacioni protokoli\IKP_PROJEKAT\Worker\Worker.cpp(59,52): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\Lenovo\Desktop\4. godina\Industrijski komunikacioni protokoli\IKP_PROJEKAT\Worker\Worker.cpp(96,51): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
-C:\Users\Lenovo\Desktop\4. godina\Industrijski komunikacioni protokoli\IKP_PROJEKAT\Worker\Worker.cpp(112,51): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Lenovo\Desktop\4. godina\Industrijski komunikacioni protokoli\IKP_PROJEKAT\Worker\Worker.cpp(61,52): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Lenovo\Desktop\4. godina\Industrijski komunikacioni protokoli\IKP_PROJEKAT\Worker\Worker.cpp(104,51): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Lenovo\Desktop\4. godina\Industrijski komunikacioni protokoli\IKP_PROJEKAT\Worker\Worker.cpp(120,51): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
   Worker.vcxproj -> C:\Users\Lenovo\Desktop\4. godina\Industrijski komunikacioni protokoli\IKP_PROJEKAT\x64\Debug\Worker.exe

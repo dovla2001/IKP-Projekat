@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "conio.h"
+#include "../Worker/WorkerData.h"
 
 #pragma comment (lib, "Ws2_32.lib")
 #pragma comment (lib, "Mswsock.lib")
@@ -19,6 +20,8 @@
 #define BUFFER_SIZE 512
 
 int main() {
+
+    printf("========================================= CLIENT ============================================\n\n");
 
     int client_socket;
     
@@ -44,12 +47,24 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
+    WorkerData workerInfo;
+
     while (true)
     {
-        printf("Unesite poruku koju zelite da skladistite:\n");
-        gets_s(dataBuffer, BUFFER_SIZE);
+       /* printf("\nUnesite poruku koju zelite da skladistite:\n");
+        gets_s(dataBuffer, BUFFER_SIZE);*/
 
-        int iResult = sendto(client_socket, dataBuffer, strlen(dataBuffer), 0, (SOCKADDR*)&server_addr, sizeof(server_addr));
+        printf("\nUnesite ime radnika: ");
+        gets_s(workerInfo.ime, sizeof(workerInfo.ime));
+
+        printf("Unesite prezime radnika: ");
+        gets_s(workerInfo.prezime, sizeof(workerInfo.prezime));
+
+        printf("Unesite platu radnika: ");
+        scanf_s("%lf", &workerInfo.plata);
+        getchar();
+
+        int iResult = sendto(client_socket, (const char*)&workerInfo, sizeof(WorkerData), 0, (SOCKADDR*)&server_addr, sizeof(server_addr));
         if (iResult == SOCKET_ERROR)
         {
             printf("sendto failed with error: %d\n", WSAGetLastError());

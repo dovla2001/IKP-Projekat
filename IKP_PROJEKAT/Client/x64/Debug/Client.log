@@ -1,4 +1,4 @@
 ﻿  Client.cpp
-C:\Users\Lenovo\Desktop\4. godina\Industrijski komunikacioni protokoli\IKP_PROJEKAT\Client\Client.cpp(41,27): warning C4244: '=': conversion from 'SOCKET' to 'int', possible loss of data
-C:\Users\Lenovo\Desktop\4. godina\Industrijski komunikacioni protokoli\IKP_PROJEKAT\Client\Client.cpp(52,63): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
+C:\Users\Lenovo\Desktop\4. godina\Industrijski komunikacioni protokoli\IKP_PROJEKAT\Client\Client.cpp(44,27): warning C4244: '=': conversion from 'SOCKET' to 'int', possible loss of data
+C:\Users\Lenovo\Desktop\4. godina\Industrijski komunikacioni protokoli\IKP_PROJEKAT\Client\Client.cpp(32,10): warning C4101: 'dataBuffer': unreferenced local variable
   Client.vcxproj -> C:\Users\Lenovo\Desktop\4. godina\Industrijski komunikacioni protokoli\IKP_PROJEKAT\x64\Debug\Client.exe

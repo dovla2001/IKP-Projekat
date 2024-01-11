@@ -24,6 +24,8 @@
 
 int main() {
 
+	printf("========================================= WORKER ============================================\n\n");
+
 	sockaddr_in worker_addr;
 
 	int workAddrLen = sizeof(worker_addr);
@@ -70,11 +72,13 @@ int main() {
 	}
 
 	WorkerData workerData;
+
+	WorkerData receivedData;
 	workerData.receivedMessages = 0;
 
 	while (true)
 	{
-		iResult = recvfrom(worker_socket, dataBuffer, BUFFER_SIZE, 0, (SOCKADDR*)&worker_addr, &workAddrLen);
+		iResult = recvfrom(worker_socket, (char*)&receivedData, sizeof(WorkerData), 0, (SOCKADDR*)&worker_addr, &workAddrLen);
 		if (iResult == SOCKET_ERROR)
 		{
 			printf("recvfrom failed with error: %d\n", WSAGetLastError());
@@ -84,13 +88,17 @@ int main() {
 		}
 
 		if (iResult != SOCKET_ERROR) {
+			
 			dataBuffer[iResult] = '\0';
 
 			if (workerData.receivedMessages < BUFFER_SIZE) {
 				//strcpy_s(workerData.receivedMessages, dataBuffer);
 				workerData.receivedMessages++;
 
-				printf("Primljena poruka: %s\n", dataBuffer);
+				printf("\nPrimljena poruka:\n");
+				printf("Ime: %s\n", receivedData.ime);
+				printf("Prezime: %s\n", receivedData.prezime);
+				printf("Plata: %.2lf\n", receivedData.plata);
 
 				char poruka[] = "Zavrseno skladistenje podataka.";
 				iResult = sendto(worker_socket, poruka, strlen(poruka), 0, (SOCKADDR*)&worker_addr, sizeof(worker_addr));

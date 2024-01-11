@@ -1,2 +1,3 @@
 ﻿  LoadBalancer.cpp
+C:\Users\Lenovo\Desktop\4. godina\Industrijski komunikacioni protokoli\IKP_PROJEKAT\Load_Balancer\LoadBalancer.cpp(164,53): warning C4267: 'argument': conversion from 'size_t' to 'int', possible loss of data
   Load_Balancer.vcxproj -> C:\Users\Lenovo\Desktop\4. godina\Industrijski komunikacioni protokoli\IKP_PROJEKAT\x64\Debug\Load_Balancer.exe

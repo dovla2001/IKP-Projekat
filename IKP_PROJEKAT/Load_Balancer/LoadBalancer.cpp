@@ -9,20 +9,39 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "conio.h"
+#include "../Worker/WorkerData.h"
+
 
 #pragma comment (lib, "Ws2_32.lib")
 #pragma comment (lib, "Mswsock.lib")
 #pragma comment (lib, "AdvApi32.lib")
 
-#define PORT 5059
+#define PORT 5060
 #define PORT_WORKER 5058
 #define BUFFER_SIZE 512
 #define MAX_WORKERS 10
 
 typedef struct {
 	sockaddr_in address;
-	int storedData;
+	WorkerData data;
 }WorkerInfo;
+
+int findWorkerWithMinData(WorkerInfo workers[], int numWorkers) {
+	int minData = INT_MAX;
+	int minIndex = -1;
+
+	for (int i = 0; i < numWorkers; i++) {
+		if (workers[i].data.receivedMessages < minData) {
+			minData = workers[i].data.receivedMessages;
+			minIndex = i;
+		}
+	}
+
+	printf("Selektovan je worker: %d\n", minIndex);
+
+	return minIndex;
+}
+
 
 int main() {
 
@@ -108,6 +127,11 @@ int main() {
 
 	int workerToBeRemoved = -1;
 
+	int receivedMessagesCount[MAX_WORKERS] = { 0 };
+
+	int nextWorkerIndex = 0;
+
+	
 	while (true)
 	{
 		sockaddr_in clientAddress;
@@ -132,6 +156,17 @@ int main() {
 			dataBuffer[iResult] = '\0';
 
 			printf("\nKlijent je poslao poruku: %s", dataBuffer);
+
+			int workerIndex = nextWorkerIndex;
+			nextWorkerIndex = (nextWorkerIndex + 1) % numWorkers;
+			receivedMessagesCount[workerIndex]++;
+
+			iResult = sendto(workerSocket, dataBuffer, strlen(dataBuffer), 0, (SOCKADDR*)&workers[workerIndex].address, sizeof(workers[workerIndex].address));
+			if (iResult == SOCKET_ERROR) {
+				printf("sendto failed with error: %d\n", WSAGetLastError());
+				// Obrada greške po potrebi...
+			}
+
 		}
 		else {
 			if (WSAGetLastError() == WSAEWOULDBLOCK) {
@@ -150,14 +185,14 @@ int main() {
 
 			if (strcmp(dataBuffer1, "PRIJAVA") == 0 && numWorkers < MAX_WORKERS) {
 				workers[numWorkers].address = workerAddr;
-				workers[numWorkers].storedData = 0;
+				workers[numWorkers].data.receivedMessages = 0;
 				numWorkers++;
-				printf("\nPrijavio se worker br. %d", numWorkers);
+				printf("\nPrijavio se worker br. %d\n", numWorkers);
 			}
 			else if (strcmp(dataBuffer1, "ODJAVA") == 0) {
 				for (int i = 0; i < numWorkers; i++) {
 					if (memcmp(&workers[i].address, &workerAddr, sizeof(workerAddr)) == 0) {
-						printf("\nOdjavio se worker br. %d", i + 1);
+						printf("\nOdjavio se worker br. %d\n", i + 1);
 
 						workerToBeRemoved = i;
 
@@ -166,7 +201,7 @@ int main() {
 				}
 			}
 			else {
-				printf("Nepoznata poruka");
+				printf("\n%s\n", dataBuffer1);
 			}
 		}
 		else {
@@ -176,7 +211,7 @@ int main() {
 			else {
 				break;
 			}
-		}		
+		}
 
 		if (workerToBeRemoved != -1) {
 			for (int i = workerToBeRemoved; i < numWorkers - 1; i++) {
@@ -184,10 +219,8 @@ int main() {
 			}
 			numWorkers--;
 			workerToBeRemoved = -1;
-		}
-		
+			}
 	}
-
 	WSACleanup();
 
 	return 0;

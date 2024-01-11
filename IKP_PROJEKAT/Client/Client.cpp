@@ -14,8 +14,8 @@
 #pragma comment (lib, "Mswsock.lib")
 #pragma comment (lib, "AdvApi32.lib")
 
-#define PORT 5059
-#define SERVER_IP "192.168.0.104"  
+#define PORT 5060
+#define SERVER_IP "192.168.0.105"  
 #define BUFFER_SIZE 512
 
 int main() {
@@ -44,19 +44,20 @@ int main() {
         exit(EXIT_FAILURE);
     }
 
-    // Slanje zahteva Load Balancer-u
-    printf("Unesite poruku koju zelite da skladistite:\n");
-    gets_s(dataBuffer, BUFFER_SIZE);
-
-    int iResult = sendto(client_socket, dataBuffer, strlen(dataBuffer), 0, (SOCKADDR*)&server_addr, sizeof(server_addr));
-    if (iResult == SOCKET_ERROR)
+    while (true)
     {
-        printf("sendto failed with error: %d\n", WSAGetLastError());
-        closesocket(client_socket);
-        WSACleanup();
-        return 1;
+        printf("Unesite poruku koju zelite da skladistite:\n");
+        gets_s(dataBuffer, BUFFER_SIZE);
+
+        int iResult = sendto(client_socket, dataBuffer, strlen(dataBuffer), 0, (SOCKADDR*)&server_addr, sizeof(server_addr));
+        if (iResult == SOCKET_ERROR)
+        {
+            printf("sendto failed with error: %d\n", WSAGetLastError());
+            closesocket(client_socket);
+            WSACleanup();
+            return 1;
+        }
     }
 
-    //closesocket(client_socket);
     return 0;
 }

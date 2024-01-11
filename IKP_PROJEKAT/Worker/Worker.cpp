@@ -8,18 +8,25 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "conio.h"
+#include "WorkerData.h"
 
 #pragma comment (lib, "Ws2_32.lib")
 #pragma comment (lib, "Mswsock.lib")
 #pragma comment (lib, "AdvApi32.lib")
 
-#define SERVER_IP "192.168.0.104" 
+#define SERVER_IP "192.168.0.105" 
 #define PORT 5058
 #define BUFFER_SIZE 512
+
+//typedef struct {
+//	int receivedMessages;
+//}WorkerData;
 
 int main() {
 
 	sockaddr_in worker_addr;
+
+	int workAddrLen = sizeof(worker_addr);
 
 	WSADATA wsaData;
 
@@ -46,18 +53,80 @@ int main() {
 		return 1;
 	}
 
+	printf("Unesite poruku (PRIJAVA/ODJAVA): ");
+	gets_s(dataBuffer, BUFFER_SIZE);
+
+	iResult = sendto(worker_socket, dataBuffer, strlen(dataBuffer), 0, (SOCKADDR*)&worker_addr, sizeof(worker_addr));
+	if (iResult == SOCKET_ERROR)
+	{
+		printf("sendto failed with error: %d\n", WSAGetLastError());
+		closesocket(worker_socket);
+		WSACleanup();
+		return 1;
+	}
+
+	if (strcmp(dataBuffer, "ODJAVA") == 0) {
+		exit(0);
+	}
+
+	WorkerData workerData;
+	workerData.receivedMessages = 0;
+
 	while (true)
 	{
-		printf("Unesite poruku (PRIJAVA/ODJAVA): ");
-		gets_s(dataBuffer, BUFFER_SIZE);
-
-		iResult = sendto(worker_socket, dataBuffer, strlen(dataBuffer), 0, (SOCKADDR*)&worker_addr, sizeof(worker_addr));
+		iResult = recvfrom(worker_socket, dataBuffer, BUFFER_SIZE, 0, (SOCKADDR*)&worker_addr, &workAddrLen);
 		if (iResult == SOCKET_ERROR)
 		{
-			printf("sendto failed with error: %d\n", WSAGetLastError());
+			printf("recvfrom failed with error: %d\n", WSAGetLastError());
 			closesocket(worker_socket);
 			WSACleanup();
 			return 1;
+		}
+
+		if (iResult != SOCKET_ERROR) {
+			dataBuffer[iResult] = '\0';
+
+			if (workerData.receivedMessages < BUFFER_SIZE) {
+				//strcpy_s(workerData.receivedMessages, dataBuffer);
+				workerData.receivedMessages++;
+
+				printf("Primljena poruka: %s\n", dataBuffer);
+
+				char poruka[] = "Zavrseno skladistenje podataka.";
+				iResult = sendto(worker_socket, poruka, strlen(poruka), 0, (SOCKADDR*)&worker_addr, sizeof(worker_addr));
+				if (iResult == SOCKET_ERROR)
+				{
+					printf("sendto failed with error: %d\n", WSAGetLastError());
+					closesocket(worker_socket);
+					WSACleanup();
+					return 1;
+				}
+			}
+
+			printf("Unesite poruku (NASTAVI/ODJAVA): ");
+			gets_s(dataBuffer, BUFFER_SIZE);
+			
+			if (strcmp(dataBuffer, "ODJAVA") == 0)
+			{
+				char poruka[] = "ODJAVA";
+				iResult = sendto(worker_socket, poruka, strlen(poruka), 0, (SOCKADDR*)&worker_addr, sizeof(worker_addr));
+				if (iResult == SOCKET_ERROR)
+				{
+					printf("sendto failed with error: %d\n", WSAGetLastError());
+					closesocket(worker_socket);
+					WSACleanup();
+					return 1;
+				}
+
+ 				printf("Odjavljeni ste. Zatvaram program.\n");
+				closesocket(worker_socket);
+				WSACleanup();
+				exit(0);
+			}
+			else if (strcmp(dataBuffer, "NASTAVI") == 0)
+			{
+				continue;
+			}
 		}
 	}
 }

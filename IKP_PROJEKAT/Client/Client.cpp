@@ -16,7 +16,7 @@
 #pragma comment (lib, "AdvApi32.lib")
 
 #define PORT 5060
-#define SERVER_IP "192.168.0.105"  
+#define SERVER_IP "192.168.0.18"  
 #define BUFFER_SIZE 512
 
 int main() {
@@ -63,6 +63,10 @@ int main() {
         printf("Unesite platu radnika: ");
         scanf_s("%lf", &workerInfo.plata);
         getchar();
+
+        printf("\n");
+
+        //printf("Velicina strukture: %d", sizeof(workerInfo));
 
         int iResult = sendto(client_socket, (const char*)&workerInfo, sizeof(WorkerData), 0, (SOCKADDR*)&server_addr, sizeof(server_addr));
         if (iResult == SOCKET_ERROR)

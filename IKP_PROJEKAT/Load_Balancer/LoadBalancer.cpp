@@ -170,7 +170,7 @@ int main() {
 			iResult = sendto(workerSocket, (char*)&receivedData, sizeof(receivedData), 0, (SOCKADDR*)&workers[workerIndex].address, sizeof(workers[workerIndex].address));
 			if (iResult == SOCKET_ERROR) {
 				printf("sendto failed with error: %d\n", WSAGetLastError());
-				// Obrada greške po potrebi...
+			
 			}
 
 		}

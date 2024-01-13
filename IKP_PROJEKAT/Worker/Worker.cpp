@@ -14,7 +14,7 @@
 #pragma comment (lib, "Mswsock.lib")
 #pragma comment (lib, "AdvApi32.lib")
 
-#define SERVER_IP "192.168.0.105" 
+#define SERVER_IP "192.168.0.18" 
 #define PORT 5058
 #define BUFFER_SIZE 512
 

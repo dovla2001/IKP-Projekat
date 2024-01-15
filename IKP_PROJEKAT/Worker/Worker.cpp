@@ -18,9 +18,12 @@
 #define PORT 5058
 #define BUFFER_SIZE 512
 
-//typedef struct {
-//	int receivedMessages;
-//}WorkerData;
+void toUpper(char* str) {
+	while (*str) {
+		*str = toupper((unsigned char)*str);
+		str++;
+	}
+}
 
 int main() {
 
@@ -58,6 +61,8 @@ int main() {
 	printf("Unesite poruku (PRIJAVA/ODJAVA): ");
 	gets_s(dataBuffer, BUFFER_SIZE);
 
+	toUpper(dataBuffer);
+
 	iResult = sendto(worker_socket, dataBuffer, strlen(dataBuffer), 0, (SOCKADDR*)&worker_addr, sizeof(worker_addr));
 	if (iResult == SOCKET_ERROR)
 	{
@@ -92,7 +97,9 @@ int main() {
 			dataBuffer[iResult] = '\0';
 
 			if (workerData.receivedMessages < BUFFER_SIZE) {
-				//strcpy_s(workerData.receivedMessages, dataBuffer);
+
+				memcpy(workerData.buffer, receivedData.buffer, sizeof(receivedData.buffer));
+
 				workerData.receivedMessages++;
 
 				printf("\nPrimljena poruka:\n");
@@ -113,6 +120,8 @@ int main() {
 
 			printf("Unesite poruku (NASTAVI/ODJAVA): ");
 			gets_s(dataBuffer, BUFFER_SIZE);
+
+			toUpper(dataBuffer);
 			
 			if (strcmp(dataBuffer, "ODJAVA") == 0)
 			{
@@ -125,6 +134,8 @@ int main() {
 					WSACleanup();
 					return 1;
 				}
+
+				memset(workerData.buffer, 0, sizeof(workerData.buffer));
 
  				printf("Odjavljeni ste. Zatvaram program.\n");
 				closesocket(worker_socket);

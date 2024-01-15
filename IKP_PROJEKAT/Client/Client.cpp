@@ -51,9 +51,6 @@ int main() {
 
     while (true)
     {
-       /* printf("\nUnesite poruku koju zelite da skladistite:\n");
-        gets_s(dataBuffer, BUFFER_SIZE);*/
-
         printf("\nUnesite ime radnika: ");
         gets_s(workerInfo.ime, sizeof(workerInfo.ime));
 
@@ -66,8 +63,6 @@ int main() {
 
         printf("\n");
 
-        //printf("Velicina strukture: %d", sizeof(workerInfo));
-
         int iResult = sendto(client_socket, (const char*)&workerInfo, sizeof(WorkerData), 0, (SOCKADDR*)&server_addr, sizeof(server_addr));
         if (iResult == SOCKET_ERROR)
         {
@@ -76,6 +71,8 @@ int main() {
             WSACleanup();
             return 1;
         }
+
+        printf("\n\n");
     }
 
     return 0;

@@ -37,9 +37,23 @@ int findWorkerWithMinData(WorkerInfo workers[], int numWorkers) {
 		}
 	}
 
-	printf("Selektovan je worker: %d\n", minIndex);
+	printf("Selektovan je worker: %d\n", minIndex+1);
 
 	return minIndex;
+}
+
+void printWorkers(WorkerInfo workers[], int numWorkers) {
+
+	if (numWorkers == 0) {
+		printf("Nema vise Worker-a");
+		return;
+	}
+
+	printf("Azurirana lista Worker-a:\n");
+
+	for (int i = 0; i < numWorkers; i++) {
+		printf("Wroker broj %d ima skladistenih %d struktura\n", i+1, workers[i].data.receivedMessages);
+	}
 }
 
 
@@ -135,6 +149,8 @@ int main() {
 
 	WorkerData receivedData;
 	
+	int successfulDataTransfer = 0;
+
 	while (true)
 	{
 		sockaddr_in clientAddress;
@@ -156,16 +172,21 @@ int main() {
 
 		if (iResult != SOCKET_ERROR) {
 
-			//dataBuffer[iResult] = '\0';
-
 			printf("\nPrimljena poruka:\n");
 			printf("Ime: %s\n", receivedData.ime);
 			printf("Prezime: %s\n", receivedData.prezime);
 			printf("Plata: %.2lf\n", receivedData.plata);
 
+			if (numWorkers == 0) {
+				printf("Nema prijavljenih workera");
+				continue;
+			}
+
 			int workerIndex = nextWorkerIndex;
 			nextWorkerIndex = (nextWorkerIndex + 1) % numWorkers;
 			receivedMessagesCount[workerIndex]++;
+
+			workerIndex = findWorkerWithMinData(workers, numWorkers);
 
 			iResult = sendto(workerSocket, (char*)&receivedData, sizeof(receivedData), 0, (SOCKADDR*)&workers[workerIndex].address, sizeof(workers[workerIndex].address));
 			if (iResult == SOCKET_ERROR) {
@@ -173,6 +194,9 @@ int main() {
 			
 			}
 
+			workers[workerIndex].data.receivedMessages++;
+
+			printf("Wroker broj %d ima skladistenih %d struktura\n", workerIndex+1, workers[workerIndex].data.receivedMessages);
 		}
 		else {
 			if (WSAGetLastError() == WSAEWOULDBLOCK) {
@@ -194,12 +218,12 @@ int main() {
 				workers[numWorkers].data.receivedMessages = 0;
 				numWorkers++;
 				printf("\nPrijavio se worker br. %d\n", numWorkers);
+				printWorkers(workers, numWorkers);
 			}
 			else if (strcmp(dataBuffer1, "ODJAVA") == 0) {
 				for (int i = 0; i < numWorkers; i++) {
 					if (memcmp(&workers[i].address, &workerAddr, sizeof(workerAddr)) == 0) {
 						printf("\nOdjavio se worker br. %d\n", i + 1);
-
 						workerToBeRemoved = i;
 
 						break;
@@ -207,7 +231,7 @@ int main() {
 				}
 			}
 			else {
-				printf("\n%s\n", dataBuffer1);
+				printf("\n%s\n", dataBuffer1);		
 			}
 		}
 		else {
@@ -225,6 +249,7 @@ int main() {
 			}
 			numWorkers--;
 			workerToBeRemoved = -1;
+			printWorkers(workers, numWorkers);
 			}
 	}
 	WSACleanup();
